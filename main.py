@@ -13,7 +13,8 @@ class Database:
 
     def createTable(self, name, attributes):
         table = self.mydb.cursor()
-        table.execute("CREATE TABLE IF NOT EXISTS " + name + " (" + attributes + ")")
+        table.execute("DROP TABLE IF EXISTS " + name)
+        table.execute("CREATE TABLE " + name + " (" + attributes + ")")
         return table
 
     def insert(self, table, sql, values):
