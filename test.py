@@ -55,6 +55,17 @@ class Database:
         self.cnx.commit()
         return self.cursor.lastrowid
 
+    def query(self, statement, args):
+        self.cursor.execute(statement, args)
+        results = []
+        for row in self.cursor:
+            results.append(row)
+        return results
+
+    def close(self):
+        self.cursor.close()
+        self.cnx.close()
+
 
 database = Database('test')
 
@@ -65,15 +76,9 @@ data_employee = {
     'gender': 'M',
     'birth_date': date(1977, 6, 14),
 }
-
 emp_no = database.insert('employees', data_employee)
 
-# Insert new employee
-# cursor.execute(INSERTS['employees'], data_employee)
-# emp_no = cursor.lastrowid
 tomorrow = datetime.now().date() + timedelta(days=1)
-
-# Insert salary information
 data_salary = {
     'emp_no': emp_no,
     'salary': 50000,
@@ -81,27 +86,14 @@ data_salary = {
     'to_date': date(9999, 1, 1),
 }
 database.insert('salaries', data_salary)
-# cursor.execute(INSERTS['salaries'], data_salary)
-
-# Make sure data is committed to the database
-cnx.commit()
-
-query = ("SELECT emp_no, first_name, last_name, hire_date FROM employees "
-         "WHERE hire_date BETWEEN %s AND %s")
 
 hire_start = date(1999, 1, 1)
 hire_end = date(1999, 12, 31)
+query = ("SELECT emp_no, first_name, last_name, hire_date FROM employees "
+         "WHERE hire_date BETWEEN %s AND %s")
+results = database.query(query, (hire_start, hire_end))
 
-cursor.execute(query, (hire_start, hire_end))
-
-for (emp_no, first_name, last_name, hire_date) in cursor:
+for (emp_no, first_name, last_name, hire_date) in results:
     print("{}: {}, {} was hired on {:%d %b %Y}".format(emp_no, last_name, first_name, hire_date))
 
-cursor.execute(INSERTS['employees'], data_employee)
-cursor.execute(query, (hire_start, hire_end))
-
-for (emp_no, first_name, last_name, hire_date) in cursor:
-    print("{}: {}, {} was hired on {:%d %b %Y}".format(emp_no, last_name, first_name, hire_date))
-
-cursor.close()
-cnx.close()
+database.close()
