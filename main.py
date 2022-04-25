@@ -26,8 +26,7 @@ class Database:
 def main():
     db = Database("localhost", "root", "P56?rN8C$fo?b?yR", "myDB")
 
-    table = db.createTable("customers", "id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), address VARCHAR(255)")
-
+    customers = db.createTable("customers", "id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), address VARCHAR(255)")
     sql = "INSERT INTO customers (name, address) VALUES (%s, %s)"
     values = [
         ('Peter', 'Lowstreet 4'),
@@ -44,7 +43,28 @@ def main():
         ('Chuck', 'Main Road 989'),
         ('Viola', 'Sideway 1633')
     ]
-    table = db.insert(table, sql, values)
+    customers = db.insert(customers, sql, values)
+
+    orders = db.createTable("orders", "id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), customer_id VARCHAR(255)")
+    sql = "INSERT INTO customers (name, address) VALUES (%s, %s)"
+    values = [
+        ('Shoes', 'Peter'),
+        ('Shoes', 'Amy'),
+        ('Shoes', 'Hannah'),
+        ('Shoes', 'Michael'),
+        ('Shoes', 'Sandy'),
+        ('Shoes', 'Betty'),
+        ('Shoes', 'Richard'),
+        ('Shoes', 'Susan'),
+        ('Shoes', 'Vicky'),
+        ('Shoes', 'Ben'),
+        ('Shoes', 'William'),
+        ('Shoes', 'Chuck'),
+        ('Shoes', 'Viola')
+    ]
+    orders.executemany(sql, values)
+    db.mydb.commit()
+    # orders = db.insert(orders, sql, values)
 
 
 if __name__ == '__main__':
