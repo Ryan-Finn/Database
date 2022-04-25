@@ -1,7 +1,8 @@
 TABLES = dict()
 
-TABLES['employees'] = (
-    "CREATE TABLE `employees` ("
+i = 'employees'
+TABLES[i] = (
+    "CREATE TABLE `{}` ("
     "    `emp_no` int NOT NULL AUTO_INCREMENT,"
     "    `birth_date` date NOT NULL,"
     "    `first_name` varchar(14) NOT NULL,"
@@ -9,17 +10,19 @@ TABLES['employees'] = (
     "    `gender` enum('M','F') NOT NULL,"
     "    `hire_date` date NOT NULL,"
     "    PRIMARY KEY (`emp_no`)"
-    ") ENGINE=InnoDB")
+    ") ENGINE=InnoDB".format(i))
 
-TABLES['departments'] = (
-    "CREATE TABLE `departments` ("
+i = 'departments'
+TABLES[i] = (
+    "CREATE TABLE `{}` ("
     "    `dept_no` char(4) NOT NULL,"
     "    `dept_name` varchar(40) NOT NULL,"
     "    PRIMARY KEY (`dept_no`), UNIQUE KEY `dept_name` (`dept_name`)"
-    ") ENGINE=InnoDB")
+    ") ENGINE=InnoDB".format(i))
 
-TABLES['salaries'] = (
-    "CREATE TABLE `salaries` ("
+i = 'salaries'
+TABLES[i] = (
+    "CREATE TABLE `{}` ("
     "    `emp_no` int NOT NULL,"
     "    `salary` int NOT NULL,"
     "    `from_date` date NOT NULL,"
@@ -27,10 +30,11 @@ TABLES['salaries'] = (
     "    PRIMARY KEY (`emp_no`,`from_date`), KEY `emp_no` (`emp_no`),"
     "    CONSTRAINT `salaries_ibfk_1` FOREIGN KEY (`emp_no`) "
     "       REFERENCES `employees` (`emp_no`) ON DELETE CASCADE"
-    ") ENGINE=InnoDB")
+    ") ENGINE=InnoDB".format(i))
 
-TABLES['dept_emp'] = (
-    "CREATE TABLE `dept_emp` ("
+i = 'dept_emp'
+TABLES[i] = (
+    "CREATE TABLE `{}` ("
     "    `emp_no` int NOT NULL,"
     "    `dept_no` char(4) NOT NULL,"
     "    `from_date` date NOT NULL,"
@@ -41,10 +45,11 @@ TABLES['dept_emp'] = (
     "       REFERENCES `employees` (`emp_no`) ON DELETE CASCADE,"
     "    CONSTRAINT `dept_emp_ibfk_2` FOREIGN KEY (`dept_no`) "
     "       REFERENCES `departments` (`dept_no`) ON DELETE CASCADE"
-    ") ENGINE=InnoDB")
+    ") ENGINE=InnoDB".format(i))
 
-TABLES['dept_manager'] = (
-    "    CREATE TABLE `dept_manager` ("
+i = 'dept_manager'
+TABLES[i] = (
+    "CREATE TABLE `{}` ("
     "    `emp_no` int NOT NULL,"
     "    `dept_no` char(4) NOT NULL,"
     "    `from_date` date NOT NULL,"
@@ -56,10 +61,11 @@ TABLES['dept_manager'] = (
     "       REFERENCES `employees` (`emp_no`) ON DELETE CASCADE,"
     "    CONSTRAINT `dept_manager_ibfk_2` FOREIGN KEY (`dept_no`) "
     "       REFERENCES `departments` (`dept_no`) ON DELETE CASCADE"
-    ") ENGINE=InnoDB")
+    ") ENGINE=InnoDB".format(i))
 
-TABLES['titles'] = (
-    "CREATE TABLE `titles` ("
+i = 'titles'
+TABLES[i] = (
+    "CREATE TABLE `{}` ("
     "    `emp_no` int NOT NULL,"
     "    `title` varchar(50) NOT NULL,"
     "    `from_date` date NOT NULL,"
@@ -67,4 +73,4 @@ TABLES['titles'] = (
     "    PRIMARY KEY (`emp_no`,`title`,`from_date`), KEY `emp_no` (`emp_no`),"
     "    CONSTRAINT `titles_ibfk_1` FOREIGN KEY (`emp_no`)"
     "       REFERENCES `employees` (`emp_no`) ON DELETE CASCADE"
-    ") ENGINE=InnoDB")
+    ") ENGINE=InnoDB".format(i))
