@@ -3,6 +3,7 @@ from mysql.connector import errorcode
 from csv import DictReader
 from tables import TABLES
 from inserts import INSERTS
+from updates import UPDATES
 
 
 # noinspection PyUnboundLocalVariable
@@ -74,8 +75,14 @@ class Database:
             print(err)
             return -1
 
-    def update(self):
-        return
+    def update(self, table_name, data):
+        try:
+            self.cursor.execute(UPDATES[table_name], data)
+            self.cnx.commit()
+            return self.cursor.lastrowid
+        except mysql.connector.Error as err:
+            print(err)
+            return
 
     def delete(self):
         return
