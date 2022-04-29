@@ -1,8 +1,41 @@
+import cmd
 from Database import Database
-from datetime import date, datetime, timedelta
 
 
-database = Database('test')
+def parse(arg):
+    return tuple(map(str, arg.split()))
+
+
+class main(cmd.Cmd):
+    def __init__(self):
+        super().__init__()
+        self.database = Database('test')
+
+    def do_test(self, args):
+        args = parse(args)
+        print(args[0], args[1:len(args)])
+
+    def do_insert(self, args):
+        """insert [table] [data]
+        Insert into [table] with [data]
+        Tables & Data syntax and order:
+            staff: first_name, last_name, sex (M, F, OTHER), birth_date (YYYY-MM-DD), hire_date (YYYY-MM-DD)
+            customers: customer_no, first_name, last_name
+            products: unit_price, quantity, locations ("a, b, c, etc.")
+            shipments:
+            orders: customer_no, products ("a, b, c, etc.")"""
+        args = parse(args)
+        self.database.insert(args[0], args[1:len(args)])
+        print()
+
+    def do_quit(self, _):
+        """Close database connection and exit program"""
+        self.database.close()
+        return True
+
+
+if __name__ == '__main__':
+    main().cmdloop()
 
 # data_employee = {
 #     'first_name': 'Geert',
@@ -30,5 +63,3 @@ database = Database('test')
 #
 # for (emp_no, first_name, last_name, hire_date) in results:
 #     print("{}: {}, {} was hired on {:%d %b %Y}".format(emp_no, last_name, first_name, hire_date))
-
-database.close()

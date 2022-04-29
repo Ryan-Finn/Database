@@ -23,7 +23,7 @@ class Database:
             cursor = cnx.cursor()
         except mysql.connector.Error as err:
             print("  Could not connect to database `{}`.".format(database_name))
-            print("    ", err)
+            print("    ", err, "\n")
             exit(1)
 
         try:
@@ -35,10 +35,10 @@ class Database:
                 self.__createDatabase(cursor, cnx, database_name)
                 self.__createTables(cursor)
             else:
-                print("    ", err)
+                print("    ", err, "\n")
                 self.close()
                 exit(1)
-
+        print()
         self.cnx = cnx
         self.cursor = cursor
 
@@ -49,7 +49,7 @@ class Database:
             cnx.database = database_name
         except mysql.connector.Error as err:
             print("  Database `{}` creation failed.".format(database_name))
-            print("    ", err)
+            print("    ", err, "\n")
             self.close()
             exit(1)
 
