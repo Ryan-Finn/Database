@@ -20,6 +20,7 @@ class main(cmd.Cmd):
             shipments:  shipment_no, status, shipment_date, delivery_date\n\
             orders:     order_no, shipment_no, customer_no, order_date, products\n\
         Attributes:\n\
+            staff_no, customer_no, product_no, shipment_no, order_no: set automatically\n\
             birth_date, hire_date, ship_date, delivery_date, order_date: YYYY-MM-DD\n\
             sex:                    M, F, or OTHER\n\
             status:                 PROCESSING, IN-TRANSIT, or DELIVERED\n\
