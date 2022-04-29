@@ -84,7 +84,7 @@ class Database:
             print(err)
             return
 
-    def delete(self):
+    def delete(self, table_name, data):
         return
 
     def query(self, statement, args):

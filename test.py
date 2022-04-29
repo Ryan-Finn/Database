@@ -11,21 +11,54 @@ class main(cmd.Cmd):
         super().__init__()
         self.database = Database('test')
 
-    def do_test(self, args):
-        args = parse(args)
-        print(args[0], args[1:len(args)])
+    def do_help(self, args):
+        string = "\
+        Tables:\n\
+            staff:      staff_no, first_name, last_name, sex, birth_date, hire_date\n\
+            customers:  customer_no, first_name, last_name\n\
+            products:   product_no, unit_price, quantity, locations\n\
+            shipments:  shipment_no, status, shipment_date, delivery_date\n\
+            orders:     order_no, shipment_no, customer_no, order_date, products\n\
+        Attributes:\n\
+            birth_date, hire_date, ship_date, delivery_date, order_date: YYYY-MM-DD\n\
+            sex:                    M, F, or OTHER\n\
+            status:                 PROCESSING, IN-TRANSIT, or DELIVERED\n\
+            locations, products:    'a, b, c, etc.'\n\
+        Examples:\n\
+            Inserting:  insert staff 'Ryan' 'Finn' M 1998-10-01 2022-05-06\n\
+            Updating:   update staff 'first_name = Not Ryan' 'staff_no = 1'\n\
+            Deleting:   delete staff 3\n\
+            Querying:   query staff\
+        "
+        print(string)
+        super().do_help(args)
 
     def do_insert(self, args):
         """insert [table] [data]
-        Insert into [table] with [data]
-        Tables & Data syntax and order:
-            staff: first_name, last_name, sex (M, F, OTHER), birth_date (YYYY-MM-DD), hire_date (YYYY-MM-DD)
-            customers: customer_no, first_name, last_name
-            products: unit_price, quantity, locations ("a, b, c, etc.")
-            shipments:
-            orders: customer_no, products ("a, b, c, etc.")"""
+        Insert [data] into [table]"""
         args = parse(args)
-        self.database.insert(args[0], args[1:len(args)])
+        print("Inserted into row ", self.database.insert(args[0], args[1:len(args)]))
+        print()
+
+    def do_update(self, args):
+        """update [table] [set] [where]
+        Update [table] by setting [set] where [where]"""
+        args = parse(args)
+        self.database.update(args[0], args[1:len(args)])
+        print()
+
+    def do_delete(self, args):
+        """delete [table] [data]
+        Delete [data] from [table]"""
+        args = parse(args)
+        self.database.delete(args[0], args[1:len(args)])
+        print()
+
+    def do_query(self, args):
+        """query [table] [select] [where] [between]
+        Query [select] from [table] where [where] between [between]"""
+        args = parse(args)
+        self.database.query(args[0], args[1:len(args)])
         print()
 
     def do_quit(self, _):
