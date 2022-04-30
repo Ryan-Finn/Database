@@ -2,23 +2,23 @@ INSERTS = dict()
 
 INSERTS['staff'] = (
     "INSERT INTO staff ("
-    "    first_name, last_name, sex, birth_date, hire_date"
+    "first_name, last_name, sex, birth_date, hire_date"
     ") VALUES (%s, %s, %s, %s, %s)")
 
 INSERTS['customers'] = (
     "INSERT INTO customers ("
-    "    customer_no, first_name, last_name"
+    "customer_no, first_name, last_name"
     ") VALUES (%s, %s, %s)")
 
 INSERTS['products'] = (
     "INSERT INTO products ("
-    "    unit_price, quantity, locations"
+    "unit_price, quantity, locations"
     ") VALUES (%s, %s, %s)")
 
 INSERTS['shipments'] = (
-    "INSERT INTO shipments () VALUES ()")
+    "INSERT INTO shipments (shipment_no) VALUES (NULL)")
 
 INSERTS['orders'] = (
     "INSERT INTO orders ("
-    "    customer_no, products"
+    "customer_no, products"
     ") VALUES (%s, %s)")

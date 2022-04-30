@@ -1,71 +1,114 @@
-import mysql.connector  # 4/29, 5/2
+import re
+import cmd
+from Database import Database
 
 
-class Database:
-    def __init__(self, host, user, password, database):
-        mydb = mysql.connector.connect(host=host, user=user, password=password)
-
-        mycursor = mydb.cursor()
-        mycursor.execute("DROP DATABASE IF EXISTS " + database)
-        mycursor.execute("CREATE DATABASE " + database)
-
-        self.mydb = mysql.connector.connect(host=host, user=user, password=password, database=database)
-
-    def createTable(self, name, attributes):
-        table = self.mydb.cursor()
-        table.execute("DROP TABLE IF EXISTS " + name)
-        table.execute("CREATE TABLE " + name + " (" + attributes + ")")
-        return table
-
-    def insert(self, table, sql, values):
-        table.executemany(sql, values)
-        self.mydb.commit()
-        return table
+def parse(args):
+    args = re.sub(r' *, *', ',', args)
+    args = re.sub(r' *= *', '=', args)
+    args = args.replace(" ", "#").replace(",", ", ").replace("=", " = ")
+    return tuple(args.split("#"))
 
 
-def main():
-    db = Database("localhost", "root", "P56?rN8C$fo?b?yR", "myDB")
+class main(cmd.Cmd):
+    def __init__(self):
+        super().__init__()
+        self.database = Database('test')
 
-    customers = db.createTable("customers", "id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), address VARCHAR(255)")
-    sql = "INSERT INTO customers (name, address) VALUES (%s, %s)"
-    values = [
-        ('Peter', 'Lowstreet 4'),
-        ('Amy', 'Apple st 652'),
-        ('Hannah', 'Mountain 21'),
-        ('Michael', 'Valley 345'),
-        ('Sandy', 'Ocean blvd 2'),
-        ('Betty', 'Green Grass 1'),
-        ('Richard', 'Sky st 331'),
-        ('Susan', 'One way 98'),
-        ('Vicky', 'Yellow Garden 2'),
-        ('Ben', 'Park Lane 38'),
-        ('William', 'Central st 954'),
-        ('Chuck', 'Main Road 989'),
-        ('Viola', 'Sideway 1633')
-    ]
-    customers = db.insert(customers, sql, values)
+    def do_getCustomersOfProduct(self, args):
+        args = parse(args)
+        self.database.advanced('foo', args)
+        print()
 
-    orders = db.createTable("orders", "id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), customer_id VARCHAR(255)")
-    sql = "INSERT INTO customers (name, address) VALUES (%s, %s)"
-    values = [
-        ('Shoes', 'Peter'),
-        ('Shoes', 'Amy'),
-        ('Shoes', 'Hannah'),
-        ('Shoes', 'Michael'),
-        ('Shoes', 'Sandy'),
-        ('Shoes', 'Betty'),
-        ('Shoes', 'Richard'),
-        ('Shoes', 'Susan'),
-        ('Shoes', 'Vicky'),
-        ('Shoes', 'Ben'),
-        ('Shoes', 'William'),
-        ('Shoes', 'Chuck'),
-        ('Shoes', 'Viola')
-    ]
-    orders.executemany(sql, values)
-    db.mydb.commit()
-    # orders = db.insert(orders, sql, values)
+    def do_getShipmentsForCustomer(self, args):
+        args = parse(args)
+        self.database.advanced('foo', args)
+        print()
+
+    def do_help(self, args):
+        string = "Database tables:\n" \
+                 "=======\n" \
+                 "  staff:      staff_no, first_name, last_name, sex, birth_date, hire_date\n" \
+                 "  customers:  customer_no, first_name, last_name\n" \
+                 "  products:   product_no, unit_price, quantity, locations\n" \
+                 "  shipments:  shipment_no, status, shipment_date, delivery_date\n" \
+                 "  orders:     order_no, shipment_no, customer_no, order_date, products\n" \
+                 "\nAttribute formats:\n" \
+                 "===========\n" \
+                 "  staff_no, product_no, shipment_no, order_no: set automatically\n" \
+                 "  birth_date, hire_date, ship_date, delivery_date, order_date: YYYY-MM-DD\n" \
+                 "  sex:                    M, F, or OTHER\n" \
+                 "  status:                 PROCESSING, IN-TRANSIT, or DELIVERED\n" \
+                 "  locations, products:    \"a, b, c, etc.\"\n" \
+                 "\nExamples:\n" \
+                 "=========\n" \
+                 "  Inserting:  insert staff Ryan Finn M 1998-10-01 2022-05-06\n" \
+                 "  Updating:   update staff first_name=Bryan staff_no=1\n" \
+                 "  Deleting:   delete staff 3\n" \
+                 "  Querying:   query staff first_name, last_name, birth_date sex = F"
+        print(string)
+        super().do_help(args)
+
+    def do_insert(self, args):
+        """insert [table] [data]
+        Example: insert staff 'Ryan' 'Finn' M 1998-10-01 2022-05-06"""
+        args = parse(args)
+        self.database.insert(args[0], args[1:len(args)])
+        print()
+
+    def do_update(self, args):
+        """update [table] [set] [where]
+        Example: update staff first_name=Bryan staff_no=1"""
+        args = parse(args)
+        self.database.update(args[0], args[1:len(args)])
+        print()
+
+    def do_delete(self, args):
+        """delete [table] [data]
+        Delete [data] from [table]"""
+        args = parse(args)
+        self.database.delete(args[0], args[1:len(args)])
+        print()
+
+    def do_query(self, args):
+        """query [table] [select] [where]
+        Query [select] from [table] where [where]"""
+        args = parse(args)
+        self.database.query(args[0], args[1:len(args)])
+        print()
+
+    def do_quit(self, _):
+        """Close database connection and exit program"""
+        self.database.close()
+        return True
 
 
 if __name__ == '__main__':
-    main()
+    main().cmdloop()
+
+# data_employee = {
+#     'first_name': 'Geert',
+#     'last_name': 'Vanderkelen',
+#     'hire_date': date(1999, 6, 14),
+#     'gender': 'M',
+#     'birth_date': date(1977, 6, 14),
+# }
+# emp_no = database.insert('employees', data_employee)
+#
+# tomorrow = datetime.now().date() + timedelta(days=1)
+# data_salary = {
+#     'emp_no': emp_no,
+#     'salary': 50000,
+#     'from_date': tomorrow,
+#     'to_date': date(9999, 1, 1),
+# }
+# database.insert('salaries', data_salary)
+#
+# hire_start = date(1999, 1, 1)
+# hire_end = date(1999, 12, 31)
+# query = ("SELECT emp_no, first_name, last_name, hire_date FROM employees "
+#          "WHERE hire_date BETWEEN %s AND %s")
+# results = database.query(query, (hire_start, hire_end))
+#
+# for (emp_no, first_name, last_name, hire_date) in results:
+#     print("{}: {}, {} was hired on {:%d %b %Y}".format(emp_no, last_name, first_name, hire_date))

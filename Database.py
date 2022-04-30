@@ -1,9 +1,11 @@
 import mysql.connector
 from mysql.connector import errorcode
-from csv import DictReader
+from csv import reader
 from tables import TABLES
 from inserts import INSERTS
 from updates import UPDATES
+from queries import QUERIES
+from advanced import ADVANCED
 
 
 # noinspection PyUnboundLocalVariable
@@ -34,6 +36,7 @@ class Database:
             if err.errno == errorcode.ER_DB_DROP_EXISTS or err.errno == errorcode.ER_BAD_DB_ERROR:
                 self.__createDatabase(cursor, cnx, database_name)
                 self.__createTables(cursor)
+                cnx.commit()
             else:
                 print("    ", err, "\n")
                 self.close()
@@ -59,37 +62,46 @@ class Database:
             try:
                 cursor.execute(TABLES[table_name])
                 with open('Initializations/' + table_name + '.csv') as file:
-                    for line in DictReader(file):
-                        cursor.execute(INSERTS[table_name], line)
+                    for line in reader(file):
+                        cursor.execute(INSERTS[table_name], tuple(line))
                 print("    Table `{}` created successfully.".format(table_name))
             except mysql.connector.Error as err:
                 print("    Table `{}` creation failed.".format(table_name))
                 print("      ", err)
 
-    def insert(self, table_name, data):
+    def insert(self, table_name, args):
+        statement = INSERTS[table_name] % args
+        print(statement + ":")
         try:
-            self.cursor.execute(INSERTS[table_name], data)
+            self.cursor.execute(statement)
+            print("  Inserted into row", self.cursor.lastrowid)
             self.cnx.commit()
-            return self.cursor.lastrowid
         except mysql.connector.Error as err:
             print(err)
-            return -1
 
-    def update(self, table_name, data):
+    def update(self, table_name, args):
+        statement = UPDATES[table_name] % args
+        print(statement)
         try:
-            self.cursor.execute(UPDATES[table_name], data)
+            self.cursor.execute(statement)
+            print("Updated", self.cursor.rowcount, "rows")
             self.cnx.commit()
-            return self.cursor.lastrowid
         except mysql.connector.Error as err:
             print(err)
-            return
 
-    def delete(self, table_name, data):
+    def delete(self, table_name, args):
+        # statement = DELETES[table_name] % args
+        # print(statement)
         return
 
-    def query(self, statement, args):
+    def query(self, table_name, args):
+        if len(args) < 2:
+            args = list(args)
+            args.append(True)
+            args = tuple(args)
+        statement = QUERIES[table_name] % args
         try:
-            self.cursor.execute(statement, args)
+            self.cursor.execute(statement)
         except mysql.connector.Error as err:
             print(err)
             return []
@@ -97,6 +109,21 @@ class Database:
         results = []
         for row in self.cursor:
             results.append(row)
+        print(statement + ":", *results, sep="\n  ")
+        return results
+
+    def advanced(self, inst, args):
+        statement = ADVANCED[inst] % args
+        try:
+            self.cursor.execute(statement)
+        except mysql.connector.Error as err:
+            print(err)
+            return []
+
+        results = []
+        for row in self.cursor:
+            results.append(row)
+        print(statement + ":", *results, sep="\n  ")
         return results
 
     def close(self):
