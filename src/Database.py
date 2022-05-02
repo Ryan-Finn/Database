@@ -6,6 +6,7 @@ from mysql.connector import errorcode
 from MySQL.inserts import INSERTS
 from MySQL.queries import QUERIES
 from MySQL.tables import TABLES
+from MySQL.triggers import TRIGGERS
 from MySQL.updates import UPDATES
 
 
@@ -42,6 +43,7 @@ class Database:
             ):
                 self.__createDatabase(cursor, cnx, database_name)
                 self.__createTables(cursor)
+                self.__createTriggers(cursor)
                 cnx.commit()
                 print("CONNECTED TO DATABASE")
             else:
@@ -55,8 +57,7 @@ class Database:
     def __createDatabase(self, cursor, cnx, database_name):
         try:
             cursor.execute(
-                f"CREATE DATABASE {database_name} DEFAULT CHARACTER SET 'UTF8MB4'"
-            )
+                f"CREATE DATABASE {database_name} DEFAULT CHARACTER SET 'UTF8MB4'")
             print(f"  Database `{database_name}` created successfully.")
             cnx.database = database_name
         except mysql.connector.Error as err:
@@ -78,6 +79,34 @@ class Database:
                 print(f"    Table `{table_name}` creation failed.")
                 print(f"      {err}")
 
+    @staticmethod
+    def __createTriggers(cursor):
+        for trigger_name in TRIGGERS:
+            try:
+                cursor.execute(TRIGGERS[trigger_name])
+                print(f"    Trigger `{trigger_name}` created successfully.")
+            except mysql.connector.Error as err:
+                print(f"    Trigger `{trigger_name}` creation failed.")
+                print(f"      {err}")
+
+    def query(self, table_name, args):
+        if len(args) < 2:
+            args = list(args)
+            args.append(True)
+            args = tuple(args)
+        statement = QUERIES[table_name] % args
+        try:
+            self.__cursor.execute(statement)
+        except mysql.connector.Error as err:
+            print(err)
+            return []
+
+        results = []
+        for row in self.__cursor:
+            results.append(row)
+        print(f"{statement}:", *results, sep="\n  ")
+        return results
+
     def insert(self, table_name, args):
         statement = INSERTS[table_name] % args
         print(f"{statement}:")
@@ -98,33 +127,12 @@ class Database:
         except mysql.connector.Error as err:
             print(err)
 
-    def delete(self, table_name, args):
-        # statement = DELETES[table_name] % args
-        # print(statement)
-        return
-
-    def query(self, table_name, args):
-        if len(args) < 2:
-            args = list(args)
-            args.append(True)
-            args = tuple(args)
-        statement = QUERIES[table_name] % args
-        try:
-            self.__cursor.execute(statement)
-        except mysql.connector.Error as err:
-            print(err)
-            return []
-
-        results = []
-        for row in self.__cursor:
-            results.append(row)
-        print(f"{statement}:", *results, sep="\n  ")
-        return results
-
     def advanced(self, inst, args):
         statement = ADVANCED[inst] % args
         try:
             self.__cursor.execute(statement)
+            if inst == "newLocation":
+                self.__cnx.commit()
         except mysql.connector.Error as err:
             print(err)
             return []
@@ -136,8 +144,9 @@ class Database:
         return results
 
     def close(self):
-        # self.__cursor.execute("DROP DATABASE IF EXISTS {}".format(self.__database_name))
+        self.__cursor.execute(
+            f"DROP DATABASE IF EXISTS {self.__database_name}")
         print("\nCLOSING CONNECTION...")
         self.__cursor.close()
         self.__cnx.close()
-        print("DISCONNECTED FROM DATABASE\n")
+        print("DISCONNECTED FROM DATABASE")
