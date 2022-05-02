@@ -51,7 +51,6 @@ class main(Cmd):
             self.prompt = "cmd>> "
             self.database = Database(args[0], self.config)
             print("Type `help` for more information.\nType `quit` to exit the program.\n")
-        elif self.prompt == "cmd>> ":
             self.newline = True
 
     # QUERIES

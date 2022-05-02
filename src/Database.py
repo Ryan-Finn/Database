@@ -73,7 +73,8 @@ class Database:
                 cursor.execute(TABLES[table_name])
                 with open(f"Initializations/{table_name}.csv") as file:
                     for line in reader(file):
-                        cursor.execute(INSERTS[table_name], tuple(line))
+                        if line[0] != '\\N':
+                            cursor.execute(INSERTS[table_name], tuple(line))
                 print(f"    Table `{table_name}` created successfully.")
             except mysql.connector.Error as err:
                 print(f"    Table `{table_name}` creation failed.")
@@ -104,7 +105,7 @@ class Database:
         results = []
         for row in self.__cursor:
             results.append(row)
-        print(f"{statement}:", *results, sep="\n  ")
+        print(f"{statement}", *results, sep="\n  ")
         return results
 
     def insert(self, table_name, args):
@@ -140,13 +141,19 @@ class Database:
         results = []
         for row in self.__cursor:
             results.append(row)
-        print(f"{statement}:", *results, sep="\n  ")
+        print(f"{statement}", *results, sep="\n  ")
         return results
 
     def close(self):
         self.__cursor.execute(
             f"DROP DATABASE IF EXISTS {self.__database_name}")
-        print("\nCLOSING CONNECTION...")
-        self.__cursor.close()
-        self.__cnx.close()
-        print("DISCONNECTED FROM DATABASE")
+        try:
+            print("\nCLOSING CONNECTION...")
+            self.__cursor.close()
+            self.__cnx.close()
+            print("DISCONNECTED FROM DATABASE")
+        except mysql.connector.Error as err:
+            print(
+                f"  Could not disconnect from database `{self.__database_name}`.")
+            print(f"    {err}\n")
+            exit(1)
