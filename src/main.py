@@ -1,5 +1,5 @@
-import cmd
 import re
+from cmd import Cmd
 
 from Database import Database
 
@@ -11,12 +11,32 @@ def parse(args):
     return tuple(args.split("#"))
 
 
-class main(cmd.Cmd):
-    intro = "Type `help` for more information.\nType `quit` to exit the program.\n"
+class main(Cmd):
+    prompt = "\nHost: "
 
     def __init__(self):
         super().__init__()
-        self.database = Database("test")
+        self.newline = False
+        self.config = {"raise_on_warnings": True}
+        self.database = None
+
+    def default(self, args):
+        args = parse(args)
+        if self.prompt == "\nHost: ":
+            self.prompt = "Username: "
+            self.config["host"] = args[0]
+        elif self.prompt == "Username: ":
+            self.prompt = "Password: "
+            self.config["user"] = args[0]
+        elif self.prompt == "Password: ":
+            self.prompt = "Schema: "
+            self.config["password"] = args[0]
+        elif self.prompt == "Schema: ":
+            self.prompt = "cmd>> "
+            self.database = Database(args[0], self.config)
+            print("Type `help` for more information.\nType `quit` to exit the program.\n")
+        elif self.prompt == "cmd>> ":
+            self.newline = True
 
     def do_getCustomersOfProduct(self, args):
         args = parse(args)
@@ -28,7 +48,7 @@ class main(cmd.Cmd):
 
     def do_help(self, args):
         string = (
-            "Database tables:\n"
+            "\nDatabase tables:\n"
             "================\n"
             "  staff:      staff_no, first_name, last_name, sex, birth_date, hire_date\n"
             "  customers:  customer_no, first_name, last_name\n"
@@ -41,13 +61,7 @@ class main(cmd.Cmd):
             "  birth_date, hire_date, ship_date, delivery_date, order_date: YYYY-MM-DD\n"
             "  sex:                    M, F, or OTHER\n"
             "  status:                 PROCESSING, IN-TRANSIT, or DELIVERED\n"
-            '  locations, products:    "a, b, c, etc."\n'
-            "\nExamples:\n"
-            "=========\n"
-            "  Inserting:  insert staff Ryan Finn M 1998-10-01 2022-05-06\n"
-            "  Updating:   update staff first_name=Bryan staff_no=1\n"
-            "  Deleting:   delete staff 3\n"
-            "  Querying:   query staff first_name, last_name, birth_date sex = F"
+            "  locations, products:    \"a, b, c, etc.\""
         )
         print(string)
         super().do_help(args)
@@ -82,36 +96,10 @@ class main(cmd.Cmd):
         return True
 
     def postcmd(self, stop, line):
-        print()
+        if self.newline:
+            print()
         return super().postcmd(stop, line)
 
 
 if __name__ == "__main__":
     main().cmdloop()
-
-# data_employee = {
-#     'first_name': 'Geert',
-#     'last_name': 'Vanderkelen',
-#     'hire_date': date(1999, 6, 14),
-#     'gender': 'M',
-#     'birth_date': date(1977, 6, 14),
-# }
-# emp_no = database.insert('employees', data_employee)
-#
-# tomorrow = datetime.now().date() + timedelta(days=1)
-# data_salary = {
-#     'emp_no': emp_no,
-#     'salary': 50000,
-#     'from_date': tomorrow,
-#     'to_date': date(9999, 1, 1),
-# }
-# database.insert('salaries', data_salary)
-#
-# hire_start = date(1999, 1, 1)
-# hire_end = date(1999, 12, 31)
-# query = ("SELECT emp_no, first_name, last_name, hire_date FROM employees "
-#          "WHERE hire_date BETWEEN %s AND %s")
-# results = database.query(query, (hire_start, hire_end))
-#
-# for (emp_no, first_name, last_name, hire_date) in results:
-#     print("{}: {}, {} was hired on {:%d %b %Y}".format(emp_no, last_name, first_name, hire_date))

@@ -1,27 +1,27 @@
 from csv import reader
 
 import mysql.connector
+from MySQL.advanced import ADVANCED
 from mysql.connector import errorcode
-from src.MySQL.advanced import ADVANCED
-from src.MySQL.inserts import INSERTS
-from src.MySQL.queries import QUERIES
-from src.MySQL.tables import TABLES
-from src.MySQL.updates import UPDATES
+from MySQL.inserts import INSERTS
+from MySQL.queries import QUERIES
+from MySQL.tables import TABLES
+from MySQL.updates import UPDATES
 
 
 # noinspection PyUnboundLocalVariable
 class Database:
-    def __init__(self, database_name):
+    def __init__(self, database_name, config):
         self.__database_name = database_name
 
-        config = {
-            "user": "root",
-            "password": "P56?rN8C$fo?b?yR",
-            "host": "127.0.0.1",
-            "raise_on_warnings": True,
-        }
+        # config = {
+        #     "user": "root",
+        #     "password": "P56?rN8C$fo?b?yR",
+        #     "host": "127.0.0.1",
+        #     "raise_on_warnings": True,
+        # }
 
-        print("\nCONNECTING TO DATABASE...")
+        print("\nOPENING CONNECTION...")
 
         try:
             cnx = mysql.connector.connect(**config)
@@ -43,6 +43,7 @@ class Database:
                 self.__createDatabase(cursor, cnx, database_name)
                 self.__createTables(cursor)
                 cnx.commit()
+                print("CONNECTED TO DATABASE")
             else:
                 print(f"    {err}\n")
                 self.close()
@@ -136,7 +137,7 @@ class Database:
 
     def close(self):
         # self.__cursor.execute("DROP DATABASE IF EXISTS {}".format(self.__database_name))
-        print("CLOSING CONNECTION...")
+        print("\nCLOSING CONNECTION...")
         self.__cursor.close()
         self.__cnx.close()
-        print("DISCONNECTED FROM DATABASE")
+        print("DISCONNECTED FROM DATABASE\n")
