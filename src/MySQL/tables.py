@@ -1,6 +1,6 @@
 TABLES = dict()
 
-TABLES['staff'] = (
+TABLES["staff"] = (
     "CREATE TABLE staff ("
     "    staff_no TINYINT NOT NULL AUTO_INCREMENT,"
     "    first_name VARCHAR(16) NOT NULL,"
@@ -9,35 +9,39 @@ TABLES['staff'] = (
     "    birth_date DATE NOT NULL,"
     "    hire_date DATE NOT NULL,"
     "    PRIMARY KEY (staff_no)"
-    ")")
+    ")"
+)
 
-TABLES['customers'] = (
+TABLES["customers"] = (
     "CREATE TABLE customers ("
     "    customer_no MEDIUMINT NOT NULL AUTO_INCREMENT,"
     "    first_name VARCHAR(16) NOT NULL,"
     "    last_name VARCHAR(16) NOT NULL,"
     "    PRIMARY KEY (customer_no)"
-    ")")
+    ")"
+)
 
-TABLES['products'] = (
+TABLES["products"] = (
     "CREATE TABLE products ("
     "    product_no SMALLINT NOT NULL AUTO_INCREMENT,"
     "    unit_price DOUBLE NOT NULL,"
     "    quantity SMALLINT NOT NULL,"
     "    locations TINYTEXT NOT NULL,"
     "    PRIMARY KEY (product_no)"
-    ")")
+    ")"
+)
 
-TABLES['shipments'] = (
+TABLES["shipments"] = (
     "CREATE TABLE shipments ("
     "    shipment_no INT NOT NULL AUTO_INCREMENT,"
     "    status ENUM('PROCESSING', 'IN-TRANSIT', 'DELIVERED') NOT NULL,"
     "    shipment_date DATETIME,"
     "    delivery_date DATETIME,"
     "    PRIMARY KEY (shipment_no)"
-    ")")
+    ")"
+)
 
-TABLES['orders'] = (
+TABLES["orders"] = (
     "CREATE TABLE orders ("
     "    order_no INT NOT NULL AUTO_INCREMENT,"
     "    shipment_no INT DEFAULT 1,"
@@ -47,7 +51,8 @@ TABLES['orders'] = (
     "    PRIMARY KEY (order_no)"
     # "    KEY shipment_no (shipment_no),"
     # "    KEY customer_no (customer_no),"
-    ")")
+    ")"
+)
 
 # i = 'warehouses'
 # TABLES[i] = (

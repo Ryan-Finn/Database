@@ -1,11 +1,12 @@
+from csv import reader
+
 import mysql.connector
 from mysql.connector import errorcode
-from csv import reader
-from tables import TABLES
-from inserts import INSERTS
-from updates import UPDATES
-from queries import QUERIES
-from advanced import ADVANCED
+from src.MySQL.advanced import ADVANCED
+from src.MySQL.inserts import INSERTS
+from src.MySQL.queries import QUERIES
+from src.MySQL.tables import TABLES
+from src.MySQL.updates import UPDATES
 
 
 # noinspection PyUnboundLocalVariable

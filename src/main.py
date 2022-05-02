@@ -1,5 +1,6 @@
-import re
 import cmd
+import re
+
 from Database import Database
 
 
@@ -55,25 +56,25 @@ class main(cmd.Cmd):
         """insert [table] [data]
         Example: insert staff 'Ryan' 'Finn' M 1998-10-01 2022-05-06"""
         args = parse(args)
-        self.database.insert(args[0], args[1 : len(args)])
+        self.database.insert(args[0], args[1: len(args)])
 
     def do_update(self, args):
         """update [table] [set] [where]
         Example: update staff first_name=Bryan staff_no=1"""
         args = parse(args)
-        self.database.update(args[0], args[1 : len(args)])
+        self.database.update(args[0], args[1: len(args)])
 
     def do_delete(self, args):
         """delete [table] [data]
         Delete [data] from [table]"""
         args = parse(args)
-        self.database.delete(args[0], args[1 : len(args)])
+        self.database.delete(args[0], args[1: len(args)])
 
     def do_query(self, args):
         """query [table] [select] [where]
         Query [select] from [table] where [where]"""
         args = parse(args)
-        self.database.query(args[0], args[1 : len(args)])
+        self.database.query(args[0], args[1: len(args)])
 
     def do_quit(self, _):
         """Close database connection and exit program"""
